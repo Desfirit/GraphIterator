@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GraphIterator
 {
-    class Graph
+    class Graph: Subject
     {
         int[,] matrix;
         uint _n;
@@ -18,6 +18,15 @@ namespace GraphIterator
             for (var i = 0; i < n; ++i)
                 for (var j = 0; j < n; ++j)
                     matrix[i,j] = 0;
+        }
+
+        ~Graph()
+        {
+            Observer[] observersArr = observers.ToArray();
+            foreach (var observer in observersArr)
+            {
+                RemoveEventListener(observer);
+            }
         }
 
         public void AddEdge(uint vert1, uint vert2)
@@ -50,6 +59,7 @@ namespace GraphIterator
 
             while(queue.Count != 0)
             {
+                Notify(queue.Peek());
                 yield return queue.Peek();
                 var vert = queue.Dequeue();
                 for (uint i = 0; i < _n; ++i)
@@ -59,5 +69,27 @@ namespace GraphIterator
                 }
             }
         }
+
+        
+        #region Interface Subject implementation
+        List<Observer> observers = new List<Observer>();
+        public void AddEventListener(Observer observer)
+        {
+            if (!observers.Contains(observer))
+                observers.Add(observer);
+        }
+        public void RemoveEventListener(Observer observer)
+        {
+            if (observers.Contains(observer))
+                observers.Remove(observer);
+        }
+        public void Notify(uint vert)
+        {
+            foreach (var observer in observers)
+            {
+                observer.Update(vert);
+            }
+        }
+        #endregion
     }
 }

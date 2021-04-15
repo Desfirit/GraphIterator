@@ -47,9 +47,13 @@ s
                 }
             }
 
+            GraphObserver graphObserver = new GraphObserver();
+
+            graph.AddEventListener(graphObserver);
+
             foreach(var vert in graph.GetIterator(0))
             {
-                Console.WriteLine(vert);
+
             }
 
             Console.ReadKey();
